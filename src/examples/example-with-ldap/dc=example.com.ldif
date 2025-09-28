@@ -1,0 +1,125 @@
+# extended LDIF
+#
+# LDAPv3
+# base <dc=example.com> with scope subtree
+# filter: (objectclass=*)
+# requesting: ALL
+#
+
+# ALL PASSWORDS = pOuetpOuet
+
+# example.com
+dn: dc=example.com
+objectClass: dcObject
+objectClass: organization
+objectClass: top
+dc: example.com
+o: "Luna[e] Example.Com"
+
+# users, example.com
+dn: ou=users,dc=example.com
+objectClass: organizationalUnit
+ou: users
+
+# groups, example.com
+dn: ou=groups,dc=example.com
+objectClass: organizationalUnit
+ou: groups
+
+# nobody, example.com
+dn: uid=nobody,dc=example.com
+objectClass: inetOrgPerson
+objectClass: lunaeUser
+uid: nobody
+cn: Nobody
+givenName: Nobody
+sn: Nobody
+userPassword: {SSHA}VMZeEf/h91ozGhgL4+Li41IWtAxnB/rj
+
+# ben, users, example.com
+dn: uid=ben,ou=users,dc=example.com
+givenName: Ben
+sn: Roro
+cn: Ben Roro
+mail: ben@example.com
+userPassword: {SSHA}VMZeEf/h91ozGhgL4+Li41IWtAxnB/rj
+objectClass: lunaeUser
+objectClass: inetOrgPerson
+uid: ben
+gid: friends
+
+# ali, users, example.com
+dn: uid=ali,ou=users,dc=example.com
+givenName: Ali
+sn: Jojo
+cn: Ali Jojo
+mail: ali@example.com
+userPassword: {SSHA}VMZeEf/h91ozGhgL4+Li41IWtAxnB/rj
+objectClass: lunaeUser
+objectClass: inetOrgPerson
+uid: ali
+gid: admins
+gid: friends
+gid: family
+
+# mike, users, example.com
+dn: uid=mike,ou=users,dc=example.com
+givenName: Mike
+sn: Gigi
+cn: Mike Gigi
+mail: mike@example.com
+gid: friends
+objectClass: lunaeUser
+objectClass: inetOrgPerson
+uid: mike
+userPassword: {SSHA}VMZeEf/h91ozGhgL4+Li41IWtAxnB/rj
+
+# chris, users, example.com
+dn: uid=chris,ou=users,dc=example.com
+givenName: Chris
+sn: Jojo
+cn: Chris Jojo
+mail: chris@example.com
+userPassword: {SSHA}VMZeEf/h91ozGhgL4+Li41IWtAxnB/rj
+objectClass: lunaeUser
+objectClass: inetOrgPerson
+uid: chris
+gid: family
+
+# admin, users, example.com
+dn: uid=admin,ou=users,dc=example.com
+objectClass: inetOrgPerson
+objectClass: lunaeUser
+uid: admin
+gid: admins
+cn: Admin
+givenName: Admin
+sn: Admin
+userPassword: {SSHA}VMZeEf/h91ozGhgL4+Li41IWtAxnB/rj
+
+# admins, groups, example.com
+dn: gid=admins,ou=groups,dc=example.com
+objectClass: lunaeGroup
+objectClass: groupOfURLs
+gid: admins
+cn: Admins
+mail: admins@example.com
+memberURL: ldap:///ou=users,dc=example.com?uid?one?(gid=admins)
+
+# family, groups, example.com
+dn: gid=family,ou=groups,dc=example.com
+objectClass: lunaeGroup
+objectClass: groupOfURLs
+gid: family
+cn: Family
+mail: family@example.com
+memberURL: ldap:///ou=users,dc=example.com?uid?one?(gid=family)
+
+# friends, groups, example.com
+dn: gid=friends,ou=groups,dc=example.com
+mail: friends@example.com
+objectClass: lunaeGroup
+objectClass: groupOfURLs
+gid: friends
+cn: Friends
+memberURL: ldap:///ou=users,dc=example.com?uid?one?(gid=friends)

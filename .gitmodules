@@ -1,0 +1,3 @@
+[submodule "src/auth-ldap"]
+	path = src/auth-ldap
+	url = https://codeberg.org/lunae/auth-ldap.git

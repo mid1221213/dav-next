@@ -1,0 +1,19 @@
+# extended LDIF
+#
+# LDAPv3
+# base <cn=lunae,cn=schema,cn=config> with scope subtree
+# filter: (objectclass=*)
+# requesting: ALL
+#
+
+# lunae, schema, config
+dn: cn=lunae,cn=schema,cn=config
+objectClass: olcSchemaConfig
+cn: lunae
+olcAttributeTypes: ( 1.3.6.1.4.1.22615.1.1.1.1 NAME 'gid' DESC 'Luna[e] gro
+ up ID' EQUALITY caseIgnoreMatch SUBSTR caseIgnoreSubstringsMatch SYNTAX 1.3.6
+ .1.4.1.1466.115.121.1.15{256} )
+olcObjectClasses: ( 1.3.6.1.4.1.22615.1.1.2.1 NAME 'lunaeGroup' DESC 'Luna[
+ e] group' SUP top AUXILIARY MUST gid MAY ( cn $ mail $ uid ) )
+olcObjectClasses: ( 1.3.6.1.4.1.22615.1.1.2.2 NAME 'lunaeUser' DESC 'Luna[e
+ ] user' SUP top AUXILIARY MAY gid )

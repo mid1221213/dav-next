@@ -1,0 +1,27 @@
+From 3a68cc52031ba67765f8faa87efc800dd2648b71 Mon Sep 17 00:00:00 2001
+From: Alexandre Jousset <mid@gtmp.org>
+Date: Fri, 25 Oct 2024 03:30:47 +0200
+Subject: [PATCH] reveal modules signatures!
+
+---
+ src/core/ngx_module.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/core/ngx_module.c b/src/core/ngx_module.c
+index 3e3c50683..6fc288cf1 100644
+--- a/src/core/ngx_module.c
++++ b/src/core/ngx_module.c
+@@ -176,8 +176,8 @@ ngx_add_module(ngx_conf_t *cf, ngx_str_t *file, ngx_module_t *module,
+ 
+     if (ngx_strcmp(module->signature, NGX_MODULE_SIGNATURE) != 0) {
+         ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
+-                           "module \"%V\" is not binary compatible",
+-                           file);
++                           "module \"%V\" is not binary compatible [%s] ≠ [%s]",
++                           file, module->signature, NGX_MODULE_SIGNATURE);
+         return NGX_ERROR;
+     }
+ 
+-- 
+2.45.2
+
