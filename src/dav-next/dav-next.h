@@ -340,7 +340,7 @@ typedef struct {
     ngx_queue_t                          queue;
     uint32_t                             token;
     time_t                               expire;
-    ngx_uint_t                           infinite; /* unsigned  infinite:1; */
+    ngx_uint_t                           infinite; // unsigned  infinite:1;
     size_t                               len;
     u_char                               data[1];
 } dav_next_node_t;
@@ -366,4 +366,4 @@ typedef struct {
 // chunk entries
 typedef ngx_str_t dav_next_chunk_entry_t;
 
-#endif /* DAV_NEXT_H */
+#endif // DAV_NEXT_H

@@ -132,7 +132,7 @@ ngx_int_t dav_next_depth(ngx_http_request_t *r, ngx_int_t dflt)
 // update ETag (= mtime) of dirs up to root
 ngx_int_t dav_next_update_etags(ngx_http_request_t *r, ngx_str_t *orig_path, size_t root, uint64_t mtime)
 {
-    ngx_str_t        path;
+    ngx_str_t path;
 
     // dup orig_path
     path.data = ngx_pstrdup(r->pool, orig_path);
@@ -159,7 +159,7 @@ ngx_int_t dav_next_update_etags(ngx_http_request_t *r, ngx_str_t *orig_path, siz
         uint64_t cur_mtime = ngx_dav_next_file_mtime(&fi);
 
         // uh oh, same time, let's increment it by 100µs
-        if (cur_mtime / 100000 == mtime / 100000) { /* 10000 groups allowed */
+        if (cur_mtime / 100000 == mtime / 100000) { // 10000 groups allowed
             cur_mtime++;
         } else { // otherwise set it
             cur_mtime = mtime;
