@@ -716,22 +716,14 @@ ngx_int_t dav_next_propfind(ngx_http_request_t *r, ngx_uint_t props)
         RETURN_500_IF(entry == NULL);
         ngx_memzero(entry, sizeof(dav_next_entry_t));
 
-        // do we need to fetch infos? (unix should need that)
+        // do we need to fetch infos? (unix should always need that)
         if (!dir.valid_info) {
-            u_char *filename = path.data;
+            // alloc enough room for dir + '/' + filename + '\0'
+            u_char *filename = ngx_pnalloc(r->pool, path.len + 1 + name.len + 1);
+            RETURN_500_IF(filename == NULL);
 
-            // maybe alloc enough room for dir + '/' + filename + '\0'
             // then copy dir path
-            if (path.len + 1 + name.len + 1 > allocated) {
-                allocated = path.len + 1 + name.len + 1 + DAV_NEXT_PREALLOCATE;
-
-                filename = ngx_pnalloc(r->pool, allocated);
-                RETURN_500_IF(filename == NULL);
-
-                last = ngx_cpystrn(filename, path.data, path.len + 1);
-            } else {
-                last = path.data + path.len;
-            }
+            last = ngx_cpystrn(filename, path.data, path.len + 1);
 
             // add separator
             *last++ = '/';
