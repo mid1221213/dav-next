@@ -35,7 +35,9 @@ authentication module (that can only be used with `dav-next`).
 
 ## Trying…, try it!
 
-If you just want to quickly test an example build / config, or you want to
+**But beforehands, please see this [important note](docs/WARNING.md).**
+
+Now, if you just want to quickly test an example build / config, or you want to
 contribute, see [TRY-ME](docs/TRY-ME.md).
 
 You should read [USING](docs/USING.md) too, it explains the main differences in

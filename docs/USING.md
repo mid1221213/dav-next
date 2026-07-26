@@ -30,19 +30,7 @@ directory selection dialog in the add account / directory sync setup. The user
 directory, `ali`, is personal, while the others, corresponding to the groups
 `family` and `friends`, are shared by their respective members.
 
-**Important note:** The root directory, which is the parent directory of these
-user and groups directories is **read-only**! Actually, it should
-be. Unfortunately, for now, the OwnCloud and NextCloud Desktop clients do not
-change the permissions of read-only directories, so nothing prevents you to
-write to the local version of the root sync directory. Using OwnCloud client,
-that makes the sync fail until you remove what you've put at this place, or
-worse, the NextCloud Desktop client removes everything in that root directory by
-itself (without any warning!).
-
-There are workarounds to this issue, the recommended one being oding a `chmod
-a-w [ROOTDIR]` (just once), or sync a subdirectory instead of the root sync
-directory (this way you would need a sync'ed directory for each group you belong
-to and one for your user directory).
+See also this [important note](WARNING.md).
 
 ## NextCloud Android client's differences
 

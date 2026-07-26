@@ -62,4 +62,6 @@ in the "Add account" wizard, select "Next", acknowledge that `http` is insecure
 `pOuetpOuet`, and you should be presented with the next screen where you can
 select what directories will be sync'ed.
 
+See also this [important note](WARNING.md).
+
 **Enjoy!**
