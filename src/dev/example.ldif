@@ -1,0 +1,56 @@
+
+# Base
+dn: dc=my-domain,dc=com
+objectClass: dcObject
+objectClass: organization
+dc: my-domain
+o: example.com
+
+# Organizational Units
+dn: ou=users,dc=my-domain,dc=com
+objectClass: organizationalUnit
+ou: users
+
+dn: ou=groups,dc=my-domain,dc=com
+objectClass: organizationalUnit
+ou: groups
+
+# Users
+dn: uid=alice,ou=users,dc=my-domain,dc=com
+objectClass: inetOrgPerson
+uid: alice
+cn: Alice
+sn: Alice
+userPassword: pOuetpOuet
+
+dn: uid=bob,ou=users,dc=my-domain,dc=com
+objectClass: inetOrgPerson
+uid: bob
+cn: Bob
+sn: Bob
+userPassword: pOuetpOuet
+
+dn: uid=charlie,ou=users,dc=my-domain,dc=com
+objectClass: inetOrgPerson
+uid: charlie
+cn: Charlie
+sn: Charlie
+userPassword: pOuetpOuet
+
+# Groups
+dn: cn=developers,ou=groups,dc=my-domain,dc=com
+objectClass: groupOfNames
+cn: developers
+member: uid=alice,ou=users,dc=my-domain,dc=com
+member: uid=bob,ou=users,dc=my-domain,dc=com
+
+dn: cn=admins,ou=groups,dc=my-domain,dc=com
+objectClass: groupOfNames
+cn: admins
+member: uid=alice,ou=users,dc=my-domain,dc=com
+
+dn: cn=qa,ou=groups,dc=my-domain,dc=com
+objectClass: groupOfNames
+cn: qa
+member: uid=bob,ou=users,dc=my-domain,dc=com
+member: uid=charlie,ou=users,dc=my-domain,dc=com

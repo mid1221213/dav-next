@@ -1,0 +1,44 @@
+# Contributor: Phillip Schichtel <phillip@schich.tel>
+# Maintainer: Jakub Jirutka <jakub@jirutka.cz>
+pkgname=nginx-mod-http-dav-next
+_modname=http_dav_next
+pkgver=0.1.0
+pkgrel=0
+pkgdesc="NGINX modules for the dav-next project"
+url="https://codeberg.org/lunae/dav-next"
+arch="all"
+license="AGPL-3.0-or-later"
+makedepends="
+	nginx-mod-dev
+        openldap-dev
+	"
+checkdepends=""
+source="
+	nginx-dav-next-$pkgver.tar.gz::https://github.com/nginxinc/nginx-otel/archive/v$pkgver.tar.gz
+	"
+builddir="$srcdir/nginx-dav-next-$pkgver"
+
+build() {
+	cp -r /usr/src/"nginx-$(_ngxver)" "$srcdir"/nginx
+	cd "$srcdir/nginx"
+	./configure --with-compat --with-http_ssl_module --with-http_dav_module --add-dynamic-module="$builddir"
+	make modules
+}
+
+package() {
+	local ngxver="$(_ngxver)"
+	depends="nginx~${ngxver%.*}"
+	local soname="ngx_http_dav_next_module.so"
+
+	install -D -m755 "$srcdir/nginx/objs/dav_next_module.so" "$pkgdir/usr/lib/nginx/modules/$soname"
+
+	echo "load_module \"modules/$soname\";" \
+	        | install -D -m644 /dev/stdin "$pkgdir/etc/nginx/modules/10_${_modname}.conf"
+}
+
+_ngxver() {
+	nginx -v 2>&1 | grep -Eo '(\d+\.\d+)+'
+}
+
+sha512sums="
+"

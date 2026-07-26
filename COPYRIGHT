@@ -1,5 +1,13 @@
-Copyright (C) 2006-2022 Igor Sysoev
-Copyright (C) 2011-2022 Nginx, Inc.
-Copyright (C) 2012-2018 Roman Arutyunyan
-Copyright © 2022-2025 Alexandre Jousset
+Some original code is Copyright (C) 2006-2022 Igor Sysoev
+Some original code is Copyright (C) 2011-2022 Nginx, Inc.
+Some original code is Copyright (C) 2012-2018 Roman Arutyunyan
+
+Only for the files src/auth-ldap.h, src/auth-ldap.c and src/auth-ldap-impl.c:
+Some original code is Copyright (C) 2011-2013 Valery Komarov
+Some original code is Copyright (C) 2013 Jiri Hruska
+Some original code is Copyright (C) 2015-2016 Victor Hahn Castell
+Some original code is Copyright (C) 2022-2023 Eric BLANCHARD
+
+Modifications of the code from above, all other code and all other files are Copyright © 2022-2026 Alexandre Jousset
+
 All rights reserved.

@@ -1,0 +1,5 @@
+alias n='nginx-debug -g "daemon off;"'
+alias tf='tail -F ~/error.log'
+alias ce='cat ~/error.log'
+alias kn='killall nginx-debug'
+alias g='gdb nginx-debug'
