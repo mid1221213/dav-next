@@ -1,10 +1,10 @@
 # Important note
 
 The sync'ed root directory, which is the parent directory of the user and groups
-sync'ed directories is virtual and **read-only**!
+sync'ed directories is virtual and **server-side read-only**!
 
-Actually, it should be set as-is with a `chmod` command. Unfortunately, for now,
-the OwnCloud and NextCloud Desktop clients do not change the permissions of
+Actually, it should be set as such with a `chmod` command. Unfortunately, for
+now, the OwnCloud and NextCloud Desktop clients do not change the permissions of
 read-only directories (although they are correctly flagged by `dav-next`), thus
 nothing prevents you to write to the local version of the root sync directory or
 even delete the groups or your user directory.
@@ -17,8 +17,10 @@ root directory by itself, **without any warning nor notification!**, that is not
 already existing server-side. Moreover, if you remove locally a group, or your
 user, directory, the behavior is wrong for both of the Desktop clients, too.
 
-Fortunately, there are workarounds to this issue, the recommended one being
-doing a `chmod -w <ROOTDIR>` (just once, when it has been created by the Desktop
-client), or sync'ing from a subdirectory instead of directly from the root sync
-directory (this way you would need a sync'ed directory for each group you belong
-to and one for your user directory).
+For now, the only usable workaround to this issue, if there is a need, is to
+sync from a subdirectory instead of directly from the root sync directory (this
+way you would need a sync'ed directory for each group you belong to and one for
+your user directory). Doing a `chmod -w <ROOTDIR>` is **not recommended
+anymore** because the NextCloud and OwnCloud Desktop clients need to store their
+sync DBs / logs there. Once they are created it's apparently OK, but they cannot
+be rotated.
