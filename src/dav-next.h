@@ -98,7 +98,10 @@ extern ngx_module_t dav_next_module;
     "      \"capabilities\": {\n"                                              \
     "        \"core\": {\n"                                                    \
     "          \"pollinterval\": 60,\n"                                        \
-    "          \"webdav-root\": \"remote.php/webdav\"\n"                       \
+    "          \"webdav-root\": \"remote.php/webdav\",\n"                      \
+    "          \"status\": {\n"                                                \
+    "            \"version\": \"28\"\n"                                        \
+    "          }\n"                                                            \
     "        },\n"                                                             \
     "        \"dav\": {\n"                                                     \
     "          \"chunking\": \"1.0\"\n"                                        \
