@@ -181,6 +181,7 @@ char *merge_loc_conf(ngx_conf_t *cf, void *parent, void *child)
 
     // get loc core module conf (to fetch `root` dir and tweak etag / satisfy)
     ngx_http_core_loc_conf_t *clcf = ngx_http_conf_get_module_loc_conf(cf, ngx_http_core_module);
+    ngx_core_conf_t *ccf = (ngx_core_conf_t *) ngx_get_conf(cf->cycle->conf_ctx, ngx_core_module);
 
     // chunk_size defaults to 10M, client_max_body_size should be ≥ 100M?
     if (clcf->client_max_body_size < 100 * 1024 * 1024) {
@@ -206,7 +207,14 @@ char *merge_loc_conf(ngx_conf_t *cf, void *parent, void *child)
     }
 
     // this directory must exist
-    RETURN_CONF_ERROR_IF(ngx_file_info(test_dir.data, &fi) == NGX_FILE_ERROR, " '%s' not found or not reachable!", test_dir.data);
+    if (ngx_file_info(test_dir.data, &fi) == NGX_FILE_ERROR) {
+        DEBUG1(cf->log, ngx_errno, "dir '%V' not found, creating it", &test_dir);
+        // let's suppose my dir does not exist (may be wrong but we don't care)
+        RETURN_CONF_ERROR_IF(ngx_create_dir(test_dir.data, 0770) == NGX_FILE_ERROR && ngx_errno != NGX_EEXIST, "directory '%V' not found and not creatable!", &test_dir);
+    }
+
+    // and belong to user
+    RETURN_CONF_ERROR_IF(chown((const char *) test_dir.data, ccf->user, ccf->group) == -1, "chown(\"%V\", %d) failed", &test_dir, ccf->user);
 
     // `<root>/uploads`
     ngx_str_set(&test_dir, "uploads\0");
@@ -216,7 +224,14 @@ char *merge_loc_conf(ngx_conf_t *cf, void *parent, void *child)
     }
 
     // this directory must exist too
-    RETURN_CONF_ERROR_IF(ngx_file_info(test_dir.data, &fi) == NGX_FILE_ERROR, " '%s' not found or not reachable!", test_dir.data);
+    if (ngx_file_info(test_dir.data, &fi) == NGX_FILE_ERROR) {
+        DEBUG1(cf->log, ngx_errno, "dir '%V' not found, creating it", &test_dir);
+        // let's suppose my dir does not exist (may be wrong but we don't care)
+        RETURN_CONF_ERROR_IF(ngx_create_dir(test_dir.data, 0770) == NGX_FILE_ERROR && ngx_errno != NGX_EEXIST, "directory '%V' not found and not creatable!", &test_dir);
+    }
+
+    // and belong to user
+    RETURN_CONF_ERROR_IF(chown((const char *) test_dir.data, ccf->user, ccf->group) == -1, "chown(\"%V\", %d) failed", &test_dir, ccf->user);
 
     return NGX_CONF_OK;
 }

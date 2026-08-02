@@ -138,7 +138,6 @@ cp -af .gdbinit .inputrc .bashrc ~/
 sed -i -e 's/^worker_processes auto/worker_processes 1/' /etc/nginx/nginx.conf
 
 ln -sf /var/log/nginx/access.log /var/log/nginx/error.log /var/log/nginx/proxy_full.log ~/
-mkdir -p /var/lib/nginx/html/files /var/lib/nginx/html/uploads
 chown -R nginx:nginx /var/lib/nginx/html/
 
 EOF
