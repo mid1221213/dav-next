@@ -180,7 +180,16 @@ char *merge_loc_conf(ngx_conf_t *cf, void *parent, void *child)
     // }
 
     // get loc core module conf (to fetch `root` dir and tweak etag / satisfy)
-    ngx_http_core_loc_conf_t  *clcf = ngx_http_conf_get_module_loc_conf(cf, ngx_http_core_module);
+    ngx_http_core_loc_conf_t *clcf = ngx_http_conf_get_module_loc_conf(cf, ngx_http_core_module);
+
+    // chunk_size defaults to 10M, client_max_body_size should be ≥ 100M?
+    if (clcf->client_max_body_size < 100 * 1024 * 1024) {
+        CF_ERROR_A(WARN, cf, 0, "client_max_body_size (%d B) must be ≥ 100 MB, fixing…", clcf->client_max_body_size);
+        clcf->client_max_body_size = 100 * 1024 * 1024;
+    }
+
+    // force internal etag processing off (defaults to 'on' but we manage it ourselves)
+    clcf->etag = 0;
 
     // TODO: check if needed ↓ (satisfy management HOWTO)
     // RETURN_CONF_ERROR_IF(clcf->satisfy != NGX_HTTP_SATISFY_ALL, "satisfy (%d) directive must be set to all (default)", clcf->satisfy);
@@ -208,9 +217,6 @@ char *merge_loc_conf(ngx_conf_t *cf, void *parent, void *child)
 
     // this directory must exist too
     RETURN_CONF_ERROR_IF(ngx_file_info(test_dir.data, &fi) == NGX_FILE_ERROR, " '%s' not found or not reachable!", test_dir.data);
-
-    // force internal etag processing off (defaults to 'on' but we manage it ourselves)
-    clcf->etag = 0;
 
     return NGX_CONF_OK;
 }
