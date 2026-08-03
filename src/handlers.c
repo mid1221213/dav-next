@@ -600,6 +600,39 @@ ngx_int_t dav_next_preaccess_handler(ngx_http_request_t *r)
     return NGX_OK;
 }
 
+ngx_int_t cleanup_upload_dirs(ngx_http_request_t *r)
+{
+    dav_next_main_conf_t *dmcf = ngx_http_get_module_main_conf(r, dav_next_module);
+
+    if (dmcf->upload_dirs_clean) {
+        return NGX_OK;
+    }
+
+    ngx_core_conf_t *ccf = (ngx_core_conf_t *) ngx_get_conf(ngx_cycle->conf_ctx, ngx_core_module);
+
+    for (ngx_uint_t i = 0; i < dmcf->upload_dirs->nelts; i++) {
+        ngx_file_info_t fi;
+
+        ngx_str_t *test_dir = ((ngx_str_t *) dmcf->upload_dirs->elts) + i;
+
+        ERROR_A(WARN, r->connection->log, 0, "cleaning / recreating %V…", test_dir);
+
+        // the directory must exist and be empty at start
+
+        if (ngx_file_info(test_dir->data, &fi) != NGX_FILE_ERROR) {
+            RETURN_500_IF(dav_next_delete_path(r->connection->log, test_dir, 1) != NGX_OK);
+        }
+        RETURN_500_IF(ngx_create_dir(test_dir->data, 0770) == NGX_FILE_ERROR && ngx_errno != NGX_EEXIST);
+
+        // and belong to user
+        RETURN_500_IF(chown((const char *) test_dir->data, ccf->user, ccf->group) == -1);
+    }
+
+    dmcf->upload_dirs_clean = 1;
+
+    return NGX_OK;
+}
+
 // nginx ACCESS handler
 ngx_int_t dav_next_access_handler(ngx_http_request_t *r)
 {
@@ -617,7 +650,11 @@ ngx_int_t dav_next_access_handler(ngx_http_request_t *r)
         return NGX_OK;
     }
 
-    return dlcf->auth_provider->auth(r, dlcf);
+    RETURN_RC_IF_COND(dlcf->auth_provider->auth(r, dlcf), rc != NGX_OK && rc != NGX_DECLINED);
+
+    RETURN_500_IF(cleanup_upload_dirs(r) != NGX_OK);
+
+    return NGX_OK;
 }
 
 // nginx PRECONTENT handler

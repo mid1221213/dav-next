@@ -356,6 +356,12 @@ typedef struct {
     dav_next_auth_identity_t *identity;
 } dav_next_ctx_t;
 
+// main configuration struct
+typedef struct {
+    ngx_array_t *upload_dirs;
+    ngx_uint_t upload_dirs_clean:1;
+} dav_next_main_conf_t;
+
 // location configuration struct
 typedef struct {
     ngx_str_t name;

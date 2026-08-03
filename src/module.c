@@ -10,6 +10,7 @@
 
 #include "dav-next.h"
 #include "handlers.h"
+#include "fileops.h"
 #include "auth.h"
 #include <ngx_config.h>
 
@@ -19,6 +20,7 @@
 char *conf_block(ngx_conf_t *cf, ngx_command_t *cmd, void *conf);
 ngx_int_t dav_next_preinit(ngx_conf_t *cf);
 ngx_int_t dav_next_init(ngx_conf_t *cf);
+void *create_main_conf(ngx_conf_t *cf);
 void *create_loc_conf(ngx_conf_t *cf);
 char *merge_loc_conf(ngx_conf_t *cf, void *parent, void *child);
 
@@ -40,7 +42,7 @@ ngx_http_module_t dav_next_module_ctx = {
     dav_next_preinit,             // preconfiguration
     dav_next_init,                // postconfiguration
 
-    NULL,                         // create main configuration
+    create_main_conf,             // create main configuration
     NULL,                         // init main configuration
 
     NULL,                         // create server configuration
@@ -149,6 +151,22 @@ ngx_int_t dav_next_get_full_name(ngx_pool_t *pool, ngx_str_t *prefix, ngx_str_t 
 }
 
 // create local conf (called by nginx for each server)
+void *create_main_conf(ngx_conf_t *cf)
+{
+    dav_next_main_conf_t *dmcf = ngx_pcalloc(cf->pool, sizeof(dav_next_main_conf_t));
+    if (dmcf == NULL) {
+        return NULL;
+    }
+
+    // initialize entries array for upload dirs to clean later
+    if ((dmcf->upload_dirs = ngx_array_create(cf->pool, 32, sizeof(ngx_str_t))) == NULL) {
+        return NULL;
+    }
+
+    return dmcf;
+}
+
+// create local conf (called by nginx for each server)
 void *create_loc_conf(ngx_conf_t *cf)
 {
     dav_next_loc_conf_t *dlcf = ngx_pcalloc(cf->pool, sizeof(dav_next_loc_conf_t));
@@ -163,7 +181,7 @@ void *create_loc_conf(ngx_conf_t *cf)
     return dlcf;
 }
 
-// create local conf (called by nginx for each server)
+// merge local conf
 char *merge_loc_conf(ngx_conf_t *cf, void *parent, void *child)
 {
     dav_next_loc_conf_t *dlcf = child;
@@ -174,12 +192,12 @@ char *merge_loc_conf(ngx_conf_t *cf, void *parent, void *child)
         dlcf->shm_zone = prev->shm_zone;
     }
 
-    // // not given, not our business
-    // if (dlcf->shm_zone == NULL) {
-    //     return NGX_CONF_OK;
-    // }
+    // not given, not our business
+    if (dlcf->shm_zone == NULL) {
+        return NGX_CONF_OK;
+    }
 
-    // get loc core module conf (to fetch `root` dir and tweak etag / satisfy)
+    // get loc core module conf (to fetch `root` dir and tweak stuff)
     ngx_http_core_loc_conf_t *clcf = ngx_http_conf_get_module_loc_conf(cf, ngx_http_core_module);
     ngx_core_conf_t *ccf = (ngx_core_conf_t *) ngx_get_conf(cf->cycle->conf_ctx, ngx_core_module);
 
@@ -214,24 +232,20 @@ char *merge_loc_conf(ngx_conf_t *cf, void *parent, void *child)
     }
 
     // and belong to user
-    RETURN_CONF_ERROR_IF(chown((const char *) test_dir.data, ccf->user, ccf->group) == -1, "chown(\"%V\", %d) failed", &test_dir, ccf->user);
+    RETURN_CONF_ERROR_IF(chown((const char *) test_dir.data, ccf->user, ccf->group) == -1, "chown(\"%V\", %d/%d) failed", &test_dir, ccf->user, ccf->group);
 
     // `<root>/uploads`
+    // this directory must exist, belong to user and be cleaned up later in init
     ngx_str_set(&test_dir, "uploads\0");
     rc = dav_next_get_full_name(cf->pool, &clcf->root, &test_dir);
     if (rc != NGX_OK) {
         return NGX_CONF_ERROR;
     }
 
-    // this directory must exist too
-    if (ngx_file_info(test_dir.data, &fi) == NGX_FILE_ERROR) {
-        DEBUG1(cf->log, ngx_errno, "dir '%V' not found, creating it", &test_dir);
-        // let's suppose my dir does not exist (may be wrong but we don't care)
-        RETURN_CONF_ERROR_IF(ngx_create_dir(test_dir.data, 0770) == NGX_FILE_ERROR && ngx_errno != NGX_EEXIST, "directory '%V' not found and not creatable!", &test_dir);
-    }
-
-    // and belong to user
-    RETURN_CONF_ERROR_IF(chown((const char *) test_dir.data, ccf->user, ccf->group) == -1, "chown(\"%V\", %d) failed", &test_dir, ccf->user);
+    dav_next_main_conf_t *dmcf = ngx_http_conf_get_module_main_conf(cf, dav_next_module);
+    ngx_str_t *later = ngx_array_push(dmcf->upload_dirs);
+    later->len = test_dir.len;
+    later->data = ngx_pstrdup(cf->pool, &test_dir);
 
     return NGX_CONF_OK;
 }
