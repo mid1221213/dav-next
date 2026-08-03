@@ -1382,7 +1382,7 @@ ngx_int_t dav_next_content_handler(ngx_http_request_t *r)
             }
 
             // do delete
-            rc = dav_next_delete_path(r, &path, dir);
+            rc = dav_next_delete_path(r->connection->log, &path, dir);
 
             if (rc == NGX_OK) {
                 return NGX_HTTP_NO_CONTENT;

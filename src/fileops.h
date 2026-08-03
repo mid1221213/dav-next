@@ -11,7 +11,7 @@
 
 #include "dav-next.h"
 
-ngx_int_t dav_next_delete_path(ngx_http_request_t *r, ngx_str_t *path, ngx_uint_t dir);
+ngx_int_t dav_next_delete_path(ngx_log_t *log, ngx_str_t *path, ngx_uint_t dir);
 ngx_int_t dav_next_delete_dir(ngx_tree_ctx_t *ctx, ngx_str_t *path);
 ngx_int_t dav_next_delete_file(ngx_tree_ctx_t *ctx, ngx_str_t *path);
 ngx_int_t dav_next_noop(ngx_tree_ctx_t *ctx, ngx_str_t *path);

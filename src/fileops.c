@@ -19,7 +19,7 @@ typedef struct {
 #pragma GCC visibility push(hidden)
 
 // delete a path and, if a dir, all files / dirs below
-ngx_int_t dav_next_delete_path(ngx_http_request_t *r, ngx_str_t *path, ngx_uint_t dir)
+ngx_int_t dav_next_delete_path(ngx_log_t *log, ngx_str_t *path, ngx_uint_t dir)
 {
     char *failed;
 
@@ -33,13 +33,15 @@ ngx_int_t dav_next_delete_path(ngx_http_request_t *r, ngx_str_t *path, ngx_uint_
             .spec_handler = dav_next_delete_file,
             .data = NULL,
             .alloc = 0,
-            .log = r->connection->log
+            .log = log
         };
 
         // TODO: 207?
 
         // delete all that's under the dir
-        RETURN_500_IF(ngx_walk_tree(&tree, path) != NGX_OK);
+        if (ngx_walk_tree(&tree, path) != NGX_OK) {
+            return dav_next_error(log, ngx_errno, NGX_HTTP_INTERNAL_SERVER_ERROR, "ngx_walk_tree", path->data);
+        }
 
         // then delete dir
         if (ngx_delete_dir(path->data) != NGX_FILE_ERROR) {
@@ -57,7 +59,7 @@ ngx_int_t dav_next_delete_path(ngx_http_request_t *r, ngx_str_t *path, ngx_uint_
         failed = ngx_delete_file_n;
     }
 
-    return dav_next_error(r->connection->log, ngx_errno, NGX_HTTP_NOT_FOUND, failed, path->data);
+    return dav_next_error(log, ngx_errno, NGX_HTTP_NOT_FOUND, failed, path->data);
 }
 
 // delete dir handler for some ngx_walk_tree() operations
@@ -524,7 +526,7 @@ overwrite_done:; // HACK: ';' to avoid 'expected expression' error in clangd
         DEBUG1(r->connection->log, 0, "delete: '%s'", copy.path.data);
 
         // delete destination
-        RETURN_RC_IF_NOK(dav_next_delete_path(r, &copy.path, dir));
+        RETURN_RC_IF_NOK(dav_next_delete_path(r->connection->log, &copy.path, dir));
     }
 
     // when moving, update source dirs ETags (set them to now)
@@ -687,7 +689,7 @@ overwrite_done:; // HACK: ';' to avoid 'expected expression' error in clangd
             h->value.data = p;
 
             // delete source upload dir
-            RETURN_500_IF(dav_next_delete_path(r, &path, 1) != NGX_OK);
+            RETURN_500_IF(dav_next_delete_path(r->connection->log, &path, 1) != NGX_OK);
 
             // response code depend on dest was existing or not
             return dest_exists == 1 ? NGX_HTTP_NO_CONTENT : NGX_HTTP_CREATED;
