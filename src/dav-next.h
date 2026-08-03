@@ -387,12 +387,6 @@ typedef struct {
     dav_next_lock_sh_t *sh;
 } dav_next_lock_t;
 
-// LDAP search result attributes
-typedef struct {
-    ngx_str_t attr_name;
-    ngx_array_t *values;
-} ldap_search_attribute_t;
-
 // chunk entries
 typedef ngx_str_t dav_next_chunk_entry_t;
 
