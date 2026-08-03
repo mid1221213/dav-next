@@ -261,14 +261,16 @@ extern ngx_module_t dav_next_module;
 
 #define LAST_CHAR_OF(str) ((str).data[(str).len - 1])
 
-#define RETURN_RC_IF_NOK(expr)                                          \
+#define RETURN_RC_IF_COND(expr, cond)                                   \
     {                                                                   \
-        ngx_int_t rc;                                                   \
-        if ((rc = (expr)) != NGX_OK) {                                  \
-            DEBUG1(r->connection->log, ngx_errno, # expr " != NGX_OK: %d", rc); \
+        ngx_int_t rc = (expr);                                          \
+        if (cond) {                                                     \
+            DEBUG1(r->connection->log, ngx_errno, # expr " - " # cond " - rc=%d", rc); \
             return rc;                                                  \
         }                                                               \
     }
+
+#define RETURN_RC_IF_NOK(expr) RETURN_RC_IF_COND((expr), (rc != NGX_OK))
 
 #define RETURN_RC_IF_NOK_EXT(log, expr)                                 \
     {                                                                   \
