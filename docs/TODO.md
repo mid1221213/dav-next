@@ -6,7 +6,6 @@
 - versionning
 - trashbin
 - public share feature
-- `ngx_uint_t protos = NGX_SSL_SSLv2…` (!) → check which protos to keep
 - quota? → how?
 - WebSocket for file modification push-notifications (NC)
 - FS size left checking when PUT / COPY?
@@ -20,6 +19,7 @@
 
 # DONE, FTR
 
+- `ngx_uint_t protos = NGX_SSL_SSLv2…` (!) → check which protos to keep → NGX_SSL_DEFAULT_PROTOCOLS
 - test `client_max_body_size xxxM`
   - minimal size
   - adjust bluk upload chunk size

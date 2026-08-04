@@ -364,8 +364,7 @@ char *parse_url(ngx_conf_t *cf, server_url_t *server_url)
         main_conf_t *halmcf = ngx_http_conf_get_module_main_conf(cf, dav_next_auth_ldap_module);
 
         if (halmcf->ssl.ctx == NULL) {
-            ngx_uint_t protos = NGX_SSL_SSLv2 | NGX_SSL_SSLv3 | NGX_SSL_TLSv1 | NGX_SSL_TLSv1_1 | NGX_SSL_TLSv1_2; // FIXME: !!!
-            RETURN_CONF_ERROR_IF(ngx_ssl_create(&halmcf->ssl, protos, halmcf) != NGX_OK, "internal error", NULL);
+            RETURN_CONF_ERROR_IF(ngx_ssl_create(&halmcf->ssl, NGX_SSL_DEFAULT_PROTOCOLS, halmcf) != NGX_OK, "internal error", NULL);
         }
 
         return NGX_CONF_OK;
