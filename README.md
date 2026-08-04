@@ -4,7 +4,7 @@ Module for [nginx](http://nginx.org) providing an easy to use WebDAV server
 compatible with the NextCloud and OwnCloud Desktop sync clients, the NextCloud
 Android client and other WebDAV implementations.
 
-**WARNING: This is not stable, not even beta software (yet!), call me alpha**
+**WARNING: This is not stable or for production, this is beta software**
 
 Some items of the [TODO](docs/TODO.md) need to be implemented before releasing a
 beta version.
