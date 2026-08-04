@@ -1,15 +1,11 @@
 # TODO
 
-- APKBUILD for Alpine APK packaging
 - reported directory size is 0 byte, not the actual size of the directory
   content including the sizes of its subdirectories
 - quota management
 - versionning
 - trashbin
-- internal / public share feature (?)
-- test `client_max_body_size xxxM`
-  - minimal size
-  - adjust bluk upload chunk size
+- public share feature
 - `ngx_uint_t protos = NGX_SSL_SSLv2…` (!) → check which protos to keep
 - quota? → how?
 - WebSocket for file modification push-notifications (NC)
@@ -24,6 +20,10 @@
 
 # DONE, FTR
 
+- test `client_max_body_size xxxM`
+  - minimal size
+  - adjust bluk upload chunk size
+- APKBUILD for Alpine APK packaging
 - "finish" README.md == now publishable
 - potential conflict between LOCK / UNLOCK between NC client
   (/remote.php/dav/files/$user/…) and direct WebDAV (/remote.php/webdav/…) → to

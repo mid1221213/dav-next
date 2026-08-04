@@ -6,8 +6,8 @@ Android client and other WebDAV implementations.
 
 **WARNING: This is not stable or for production, this is beta software**
 
-Some items of the [TODO](docs/TODO.md) need to be implemented before releasing a
-beta version.
+Some items of the [TODO](docs/TODO.md) need to be implemented, and a lot of
+testing to do before releasing a stable version (`v1.0.0`).
 
 ## About
 
