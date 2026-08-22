@@ -1,12 +1,12 @@
 # TODO
 
+- add emoji 👥 to groups?
 - reported directory size is 0 byte, not the actual size of the directory
   content including the sizes of its subdirectories
 - quota management
-- versionning
+- versioning
 - trashbin
 - public share feature
-- quota? → how?
 - WebSocket for file modification push-notifications (NC)
 - FS size left checking when PUT / COPY?
 - e2e testing
