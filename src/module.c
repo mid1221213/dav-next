@@ -177,6 +177,7 @@ void *create_loc_conf(ngx_conf_t *cf)
     // set conf default values
     dlcf->shm_timeout = 60;
     dlcf->shm_size = (ssize_t) (8 * ngx_pagesize);
+    dlcf->root_is_writable = 1;
 
     return dlcf;
 }
@@ -263,6 +264,28 @@ char *conf_block_item(ngx_conf_t *cf, ngx_command_t *dummy, void *conf)
         // return "is unknown";
     case 2:
         if (NGX_STR_CST_EQ(&value[0], "auth")) {
+            dlcf->auth_provider = dav_next_auth_find_provider(&value[1]);
+            RETURN_CONF_ERROR_IF(dlcf->auth_provider == NULL, "unknown auth provider \"%V\"", &value[1]);
+
+            if (dlcf->auth_provider->prepare_conf != NULL) {
+                dlcf->auth_conf = dlcf->auth_provider->prepare_conf(cf);
+                RETURN_CONF_ERROR_IF(dlcf->auth_conf == NGX_CONF_ERROR, "could not prepare conf in provider \"%V\"", &value[1]);
+            } else {
+                dlcf->auth_conf = NULL;
+            }
+
+            return NGX_CONF_OK;
+
+        } else if (NGX_STR_CST_EQ(&value[0], "root_is_writable")) {
+            if (NGX_STR_CST_EQ(&value[1], "on")) {
+                dlcf->root_is_writable = 1;
+            } else if (NGX_STR_CST_EQ(&value[1], "off")) {
+                dlcf->root_is_writable = 0;
+            } else {
+                CF_ERROR_A(EMERG, cf, 0, "root_is_writable value ('%V') can only be 'on' or 'off'", &value[1]);
+                return NGX_CONF_ERROR;
+            }
+
             dlcf->auth_provider = dav_next_auth_find_provider(&value[1]);
             RETURN_CONF_ERROR_IF(dlcf->auth_provider == NULL, "unknown auth provider \"%V\"", &value[1]);
 

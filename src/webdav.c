@@ -55,6 +55,8 @@ uintptr_t dav_next_format_propfind(ngx_http_request_t *r, u_char *dst, dav_next_
         "<D:locktype><D:write/></D:locktype>\n"
         "</D:lockentry>\n";
 
+    dav_next_loc_conf_t *dlcf = ngx_http_get_module_loc_conf(r, dav_next_module);
+
     // if we just want the length
     if (dst == NULL) {
         // constant strings
@@ -116,7 +118,11 @@ uintptr_t dav_next_format_propfind(ngx_http_request_t *r, u_char *dst, dav_next_
             len += 8 + DAV_NEXT_HEX_ID_LEN;
 
             // permissions
-            len += entry->read_only ? 2 : (entry->is_group ? sizeof("GSWCKDNV") : sizeof("GWCKDNV")) - 1;
+            if (entry->virtual_root) {
+                len += dlcf->root_is_writable ? sizeof("GCK") : sizeof("G");
+            } else {
+                len += (entry->is_group ? sizeof("GSWCKDNV") : sizeof("GWCKDNV")) - 1;
+            }
 
             // quota-available-bytes
             len += NGX_OFF_T_LEN;
@@ -183,8 +189,8 @@ uintptr_t dav_next_format_propfind(ngx_http_request_t *r, u_char *dst, dav_next_
         }
 
         if (props & DAV_NEXT_PROP_PERMISSIONS) {
-            if (entry->read_only) {
-                dst = ngx_sprintf(dst, "<O:permissions>GM</O:permissions>\n");
+            if (entry->virtual_root) {
+                dst = ngx_sprintf(dst, (dlcf->root_is_writable ? "<O:permissions>GCK</O:permissions>\n" : "<O:permissions>G</O:permissions>\n"));
             } else if (entry->is_group) {
                 dst = ngx_sprintf(dst, "<O:permissions>GSWCKDNV</O:permissions>\n");
             } else {
@@ -453,7 +459,7 @@ ngx_int_t dav_next_propfind(ngx_http_request_t *r, ngx_uint_t props)
     main_entry->mtime = ngx_dav_next_file_mtime(&fi);
     main_entry->size = ngx_file_size(&fi);
     main_entry->id = ngx_file_uniq(&fi);
-    main_entry->read_only = ctx->is_virtual_root ? 1 : 0; // if virtual root, then don't try to mess with it!
+    main_entry->virtual_root = ctx->is_virtual_root ? 1 : 0; // if virtual root, then don't try to mess with it!
     main_entry->is_group = ctx->in_group ? 1 : 0;         // to set "shared" flag
 
     if (!main_entry->dir || (dav_next_fs_get_quota(path.data, &main_entry->fs_used, &main_entry->fs_avail) != NGX_OK)) {
@@ -534,7 +540,7 @@ ngx_int_t dav_next_propfind(ngx_http_request_t *r, ngx_uint_t props)
             entry->mtime = ngx_dav_next_file_mtime(&fi);
             entry->size = ngx_file_size(&fi);
             entry->id = ngx_file_uniq(&fi);
-            entry->read_only = 0;
+            entry->virtual_root = 0;
             entry->is_group = 0;
             entry->fs_used = 0;
             entry->fs_avail = NGX_MAX_OFF_T_VALUE;
@@ -618,7 +624,7 @@ ngx_int_t dav_next_propfind(ngx_http_request_t *r, ngx_uint_t props)
                 entry->mtime = entry_mtime;
                 entry->size = ngx_file_size(&fi);
                 entry->id = ngx_file_uniq(&fi);
-                entry->read_only = 0;
+                entry->virtual_root = 0;
                 entry->is_group = 1;
                 entry->fs_used = 0;
                 entry->fs_avail = NGX_MAX_OFF_T_VALUE;
@@ -750,7 +756,7 @@ ngx_int_t dav_next_propfind(ngx_http_request_t *r, ngx_uint_t props)
         entry->mtime = ngx_dav_next_de_mtime(&dir);
         entry->size = ngx_de_size(&dir);
         entry->id = ngx_file_uniq(&dir.info);
-        entry->read_only = 0;
+        entry->virtual_root = 0;
         entry->is_group = 0;
         entry->fs_used = 0;
         entry->fs_avail = NGX_MAX_OFF_T_VALUE;

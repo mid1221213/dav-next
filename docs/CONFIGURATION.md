@@ -17,6 +17,16 @@ The detailed available directives are:
 - *Description:* Declare the authentication method of this `dav-next`
   instance. The `<type>` is one of `basic` or `ldap`
 
+## `root_is_writable`
+
+- *Syntax:* `root_is_writable [on|off]`
+- *Context:* `dav_next`
+- *Default:* `on`
+- *Description:* Return "write allowed" permissions for the virtual root (the
+  root path containing the user and group folders). This is a workaround for [a
+  bug in NextCloud](https://github.com/nextcloud/desktop/pull/10226). See
+  [important note](WARNING.md).
+
 ## `lock_mem`
 
 - *Syntax:* `lock_mem <size>`

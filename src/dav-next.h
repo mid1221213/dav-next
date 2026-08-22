@@ -325,7 +325,7 @@ typedef struct {
     ngx_str_t lock_root;
     uint32_t lock_token;
 
-    unsigned read_only:1;
+    unsigned virtual_root:1;
     unsigned dir:1;
     unsigned is_group:1;
     unsigned lock_supported:1;
@@ -371,6 +371,7 @@ typedef struct {
     register_provider_t register_provider;
     dav_next_auth_provider_t *auth_provider;
     void *auth_conf;
+    ngx_uint_t root_is_writable:1;
 } dav_next_loc_conf_t;
 
 // lock node struct
