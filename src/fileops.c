@@ -30,7 +30,7 @@ ngx_int_t dav_next_delete_path(ngx_log_t *log, ngx_str_t *path, ngx_uint_t dir)
             .file_handler = dav_next_delete_file,
             .pre_tree_handler = dav_next_noop,
             .post_tree_handler = dav_next_delete_dir,
-            .spec_handler = dav_next_delete_file,
+            .spec_handler = dav_next_noop,
             .data = NULL,
             .alloc = 0,
             .log = log

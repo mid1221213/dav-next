@@ -127,24 +127,26 @@ ngx_int_t dav_next_init_zone(ngx_shm_zone_t *shm_zone, void *data)
 }
 
 // copied / modified from nginx source's src/core/ngx_file.c:ngx_get_full_name()
-ngx_int_t dav_next_get_full_name(ngx_pool_t *pool, ngx_str_t *prefix, ngx_str_t *name)
+ngx_int_t dav_next_get_full_name_0(ngx_pool_t *pool, ngx_str_t *prefix, ngx_str_t *name)
 {
     if (name->data[0] == '/') {
         return NGX_OK;
     }
 
-    size_t len = prefix->len;
+    size_t plen = prefix->len;
+    size_t nlen = name->len;
 
-    u_char *n = ngx_pnalloc(pool, len + name->len + 1 + 1);
+    u_char *n = ngx_pnalloc(pool, plen + nlen + 1 + 1);
     if (n == NULL) {
         return NGX_ERROR;
     }
 
-    u_char *p = ngx_cpymem(n, prefix->data, len);
+    u_char *p = ngx_cpymem(n, prefix->data, plen);
     p = ngx_cpymem(p, "/", 1);
-    ngx_cpystrn(p, name->data, name->len + 1);
+    p = ngx_cpymem(p, name->data, nlen);
+    *p = '\0';
 
-    name->len += len;
+    name->len += plen + 1;
     name->data = n;
 
     return NGX_OK;
@@ -219,8 +221,8 @@ char *merge_loc_conf(ngx_conf_t *cf, void *parent, void *child)
     ngx_file_info_t fi;
 
     // `<root>/files`
-    ngx_str_set(&test_dir, "files\0");
-    rc = dav_next_get_full_name(cf->pool, &clcf->root, &test_dir);
+    ngx_str_set(&test_dir, "files");
+    rc = dav_next_get_full_name_0(cf->pool, &clcf->root, &test_dir);
     if (rc != NGX_OK) {
         return NGX_CONF_ERROR;
     }
@@ -237,16 +239,15 @@ char *merge_loc_conf(ngx_conf_t *cf, void *parent, void *child)
 
     // `<root>/uploads`
     // this directory must exist, belong to user and be cleaned up later in init
-    ngx_str_set(&test_dir, "uploads\0");
-    rc = dav_next_get_full_name(cf->pool, &clcf->root, &test_dir);
+    ngx_str_set(&test_dir, "uploads");
+    rc = dav_next_get_full_name_0(cf->pool, &clcf->root, &test_dir);
     if (rc != NGX_OK) {
         return NGX_CONF_ERROR;
     }
 
     dav_next_main_conf_t *dmcf = ngx_http_conf_get_module_main_conf(cf, dav_next_module);
     ngx_str_t *later = ngx_array_push(dmcf->upload_dirs);
-    later->len = test_dir.len;
-    later->data = ngx_pstrdup(cf->pool, &test_dir);
+    *later = test_dir;
 
     return NGX_CONF_OK;
 }
