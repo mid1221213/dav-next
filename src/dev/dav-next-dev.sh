@@ -93,7 +93,7 @@ echo $RESET $BUILD $LDAP$LDAP2 $FULL
 
 cd $(dirname $0)
 
-CONT_ID="$(docker container ls --quiet --filter name=$NAME)"
+CONT_ID="$(docker container ls -a --quiet --filter name=$NAME)"
 
 if [[ $RESET == reset && -n $CONT_ID ]]; then
     docker rm -f $NAME
