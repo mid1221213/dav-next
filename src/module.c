@@ -127,10 +127,13 @@ ngx_int_t dav_next_init_zone(ngx_shm_zone_t *shm_zone, void *data)
 }
 
 // copied / modified from nginx source's src/core/ngx_file.c:ngx_get_full_name()
+// blindly concatenate <name> to <prefix>
+// <prefix> must be absolute, <name> must be relative
 ngx_int_t dav_next_get_full_name_0(ngx_pool_t *pool, ngx_str_t *prefix, ngx_str_t *name)
 {
-    if (name->data[0] == '/') {
-        return NGX_OK;
+    // safety checks
+    if (prefix->data[0] != '/' || name->data[0] == '/') {
+        return NGX_ERROR;
     }
 
     size_t plen = prefix->len;
