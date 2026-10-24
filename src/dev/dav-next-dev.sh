@@ -11,8 +11,8 @@
 set -euo pipefail
 
 # set mandatory variables
-: ${AVER:=3.24.1}
-: ${NVER:=1.30.4}
+: ${AVER:=3.24.2}
+: ${NVER:=1.30.6}
 : ${RESET:=noreset}
 : ${BUILD:=nobuild}
 : ${LDAP:=noldap}
