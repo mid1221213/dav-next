@@ -11,6 +11,7 @@
 
 #include "dav-next.h"
 
+ngx_int_t is_valid_user(ngx_http_request_t *r);
 void sanitize_str(u_char *str);
 ngx_uint_t hex_digit_value(u_char c);
 void hex_decode(ngx_str_t *dst, ngx_str_t *src);

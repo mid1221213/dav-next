@@ -1285,6 +1285,9 @@ ngx_int_t auth(ngx_http_request_t *r, void *conf)
             return NGX_HTTP_INTERNAL_SERVER_ERROR;
         }
 
+        // check if user name is valid
+        RETURN_RC_IF_NOK(is_valid_user(r));
+
         DEBUG1(r->connection->log, 0, "username is \"%V\"", &r->headers_in.user);
         if (r->headers_in.passwd.len == 0) {
             DEBUG0(r->connection->log, 0, "password is empty");

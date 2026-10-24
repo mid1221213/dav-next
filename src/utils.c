@@ -8,6 +8,46 @@
 
 #include "utils.h"
 
+// check if user name is valid
+ngx_int_t is_valid_user(ngx_http_request_t *r)
+{
+    ngx_str_t *user = &r->headers_in.user;
+
+    if (user->len == 0 || user->len > 64) {
+        ERROR_A(WARN, r->connection->log, 0, "wrong user length: %d", user->len);
+        return NGX_HTTP_FORBIDDEN;
+    }
+
+    for (ngx_uint_t i = 0; i < user->len; i++) {
+        char c = user->data[i];
+
+        // only allowed chars
+        if ((c >= '0' && c <= '9') ||
+            (c >= 'a' && c <= 'z') ||
+            (c >= 'A' && c <= 'Z') ||
+            c == '-' || c == '.') {
+
+            if (c == '.') {
+                // do not start nor end with a '.'
+                if (i == 0 || i == user->len - 1) {
+                    ERROR(WARN, r->connection->log, 0, "user cannot start or end with a '.'");
+                    return NGX_HTTP_FORBIDDEN;
+                }
+                // no consecutive '.'
+                if (i > 0 && user->data[i - 1] == '.') {
+                    ERROR(WARN, r->connection->log, 0, "user cannot have consecutive '.'");
+                    return NGX_HTTP_FORBIDDEN;
+                }
+            }
+        } else {
+            ERROR_A(WARN, r->connection->log, 0, "forbidden character in user: '%c'", c);
+            return NGX_HTTP_FORBIDDEN;
+        }
+    }
+
+    return NGX_OK;
+}
+
 void sanitize_str(u_char *str) {
     static u_char sanitizeTable[256] = {0xff};
 

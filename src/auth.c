@@ -7,6 +7,7 @@
  */
 
 #include "dav-next.h"
+#include "utils.h"
 #include "auth.h"
 
 ngx_int_t set_header_auth(ngx_http_request_t *r)
@@ -106,6 +107,11 @@ dav_next_auth_identity_t *dav_next_auth_get_identity(ngx_http_request_t *r)
 
     // no provider configured: fallback to basic uid extraction
     if (ngx_http_auth_basic_user(r) != NGX_OK) {
+        return NULL;
+    }
+
+    // check if user name is valid
+    if (is_valid_user(r) != NGX_OK) {
         return NULL;
     }
 

@@ -591,6 +591,9 @@ ngx_int_t dav_next_preaccess_handler(ngx_http_request_t *r)
         return set_header_auth(r);
     }
 
+    // check if user name is valid
+    RETURN_RC_IF_NOK(is_valid_user(r));
+
     // security check: if auth'ed and DAV_NEXT_URI_DAV,
     //  no need to go further: 403
     if (ctx->uri_type == DAV_NEXT_URI_DAV) {

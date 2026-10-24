@@ -553,6 +553,9 @@ ngx_int_t get_identity(ngx_http_request_t *r, dav_next_auth_identity_t *identity
         return NGX_DECLINED;
     }
 
+    // check if user name is valid
+    RETURN_RC_IF_NOK(is_valid_user(r));
+
     // set uid from request
     identity->uid = r->headers_in.user;
     identity->gids = NULL;
